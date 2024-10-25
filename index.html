@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>User Select</title>
+        <style>
+            body {
+                background-color: darkgrey;
+                color: antiquewhite;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            .container {
+                height: 100%;
+                width: 100%;
+                padding: 2rem;
+            }
+            .form {
+                max-width: fit-content;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            p.grade input:checked + span.error{ 
+                font-weight: bold;
+                border-color: #f44336;
+                background-color: #7f241e;
+                color: #ffffff;
+    
+            } 
+            p.grade input:checked + span.correct{ 
+                font-weight: bold; 
+                border-color: #3af729;
+                background-color: #097209;
+                color: #ffffff;
+            } 
+            .grade {
+                pointer-events: none;
+            }
+            .paragraph {
+                width: 30rem;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            label {
+                display: block;
+                padding: 0 0 1rem 0;
+            }
+            span {
+                padding: 0.25rem;
+            }
+        </style>
+        <script>
+            // test quiz api
+            const gistUrl = 'https://gist.githubusercontent.com/MisterHerndon/6a6b977b7978d1c28e09724aa14e428b/raw/unit2ExamQuestions.json';
+            let questions = {};
+            async function fetchJson() {
+                try {
+                    const response = await fetch(gistUrl);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const json = await response.json();
+                    // questions = json;
+                    start();
+                } catch (error) {
+                    alert('Error fetching JSON:' + error);
+                }
+            }
+            fetchJson();
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <p class="test"></p>
+            <p class="paragraph"></p>
+            <button onclick="grade()">Check Answers</button>
+        </div>
+        <script>
+            // define the quiz questions as a json object
+            // questions = {
+            //     0: {
+            //         question: "Why is Tim?",
+            //         answers: {
+            //             a: "Just cause",
+            //             b: "His mom said so",
+            //             c: "For fun",
+            //             d: "To slay"
+            //         },
+            //         correct: "d"
+            //     },
+            //     1: {
+            //         question: "What is Cooper?",
+            //         answers: {
+            //             a: "Bruh?",
+            //             b: "Friendly neighborhood spider man?",
+            //             c: "Human",
+            //             d: "Cumin like the spice"
+            //         },
+            //         correct: "d"
+            //     },
+            //     2: {
+            //         question: "How is Drake?",
+            //         answers: {
+            //             a: "Just fine",
+            //             b: "Pretty good",
+            //             c: "flippin` awesome",
+            //             d: "tired"
+            //         },
+            //         correct: "d"
+            //     },
+            //     3: {
+            //         question: "When is Scott?",
+            //         answers: {
+            //             a: "Yesteryear",
+            //             b: "Today",
+            //             c: "September 14th, 1224",
+            //             d: "Junteenth"
+            //         },
+            //         correct: "c"
+            //     },
+            //     4: {
+            //         question: "Where is Karlie?",
+            //         answers: {
+            //             a: "Sleeping in bed",
+            //             b: "France",
+            //             c: "The Yucatan",
+            //             d: "The Dungeon"
+            //         },
+            //         correct: "b"
+            //     }
+            // };
+
+            /** create a loop of the object properties (each defined question is a single property)
+             *  
+             * using a for loop that ends at the length of the object properties
+             * 
+             * Object.key(whateverMyObjectIs) will return an array of the top level property names, in my case that will be [0, 1, 2, 3, 4]
+             * running .length on an array will give you a count of the array so, again in my case, Object.keys(whateverMyObjectIs).length
+             * will return 5.
+             */
+            function start() {
+                // create the div that our question will live in
+                let div = document.createElement('div');
+                for (let i = 0; i < Object.keys(questions).length; i++) {
+                    // add text to the div
+                    div.innerHTML += questions[i].question;
+                    
+                    /** Here we loop through the answers using a different loop syntax
+                     * the let..of loop is a more natural way to loop an object.  It does return 
+                     * several different types of things, but we are controling that with destructuring
+                     * The [key, value] part is saying, "of all the things you are giving me, I only want
+                     * the key and the value to use in my loop"
+                     */
+                    for(let [key, value] of Object.entries(questions[i].answers)){
+                        // alert(key, value);
+                        // create an input
+                        const input = document.createElement('input');
+                        // give the input basic properties (which are converted to attributes when they are added to the page)  
+                        // type = 'radio', name, id, and value are essentially required for our design
+                        input.type = 'radio';
+                        // each radio button for the same question must have the same name to work properly
+                        input.name = 'question' + i;
+                        input.id = key + i;
+                        input.value = 'question' + i;
+                        input.dataset.correct = (questions[i].correct === key) ? 'true' : 'false';
+                        // now we make our label
+                        const label = document.createElement('label');
+                        // add the radio button to the label (placing it inside helps with behavior in this case)
+                        label.appendChild(input);
+                        // this "for" attribute needs to be the same as the input id
+                        label.htmlFor = key + i;
+                        // create a span node for adding the text (otherwise it won't play nice with the input)
+                        const textNodeOne = document.createElement('span');
+                        textNodeOne.classList.add((questions[i].correct === key) ? 'correct' : 'error');
+                        // add the text
+                        textNodeOne.innerText = value;
+                        // add the span to the label
+                        label.appendChild(textNodeOne);
+                        // create a line break, but we need to reuse the same one multiple times so we need to clone it
+                        // div.appendChild(br.cloneNode(true));
+                        // add the label (with all of it's children) to the div
+                        div.appendChild(label);
+                    }
+                }
+            
+                // finally add the div to the existing paragraph tag
+                document.querySelector('.paragraph').appendChild(div);
+            }
+            function grade() {
+                document.querySelector('.paragraph').classList.add('grade');
+                correct = document.querySelectorAll('input:checked[data-correct="true"]').length;
+                alert(correct/Object.keys(questions).length*100 + '%');
+            }
+
+            start();
+        </script>
+    </body>
+</html>
