@@ -49,7 +49,7 @@
         </style>
         <script>
             // test quiz api
-            const gistUrl = 'https://gist.githubusercontent.com/MisterHerndon/6a6b977b7978d1c28e09724aa14e428b/raw/unit2ExamQuestions.json';
+            const gistUrl = 'https://gist.githubusercontent.com/MisterHerndon/6a6b977b7978d1c28e09724aa14e428b/raw/2bbf8abb9e5598a8c3d48e8903da74ae6b4e07af/unit2ExamQuestions.json';
             let questions = {};
             async function fetchJson() {
                 try {
@@ -58,7 +58,7 @@
                         throw new Error('Network response was not ok');
                     }
                     const json = await response.json();
-                    // questions = json;
+                    questions = json;
                     start();
                 } catch (error) {
                     alert('Error fetching JSON:' + error);
